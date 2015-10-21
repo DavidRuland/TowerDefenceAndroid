@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 
 /**
@@ -24,6 +25,7 @@ public CheckBox checkBoxOn,checkBoxOff;
   public MediaPlayer mySound;
     SeekBar volControl;
     private AudioManager audioManager = null;
+    TextView mControl;
     public optionsFragment() {
         // Required empty public constructor
     }
@@ -38,6 +40,7 @@ public CheckBox checkBoxOn,checkBoxOff;
         checkBoxOff = (CheckBox) v.findViewById(R.id.checkBox2);
         volControl = (SeekBar) v.findViewById(R.id.seekBar);
         mySound=MediaPlayer.create(getContext(),R.raw.l2);
+        mControl=(TextView)v.findViewById(R.id.textView4);
         checkBoxOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,10 +53,32 @@ public CheckBox checkBoxOn,checkBoxOff;
             @Override
             public void onClick(View v) {
                 if (checkBoxOff.isChecked()) {
-                    mySound.setVolume(0,0);
+                    mySound.setVolume(0, 0);
                 }
             }
         });
+        volControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+            {
+                if (fromUser)
+                {
+                    mControl.setText("Music volume: " + progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
 
 
         return v;

@@ -16,7 +16,10 @@ import java.util.Vector;
  * A simple {@link Fragment} subclass.
  */
 public class GameScreenFragment extends Fragment {
-    private Vector<User> users = new Vector<User>();
+
+    //A vector is like an ArrayList a little bit slower but Thread-safe. This means that it can handle concurrent changes.
+
+
 
     public GameScreenFragment() {
         // Required empty public constructor
