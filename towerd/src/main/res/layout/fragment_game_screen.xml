@@ -14,16 +14,18 @@
         android:text="Towers"
         android:background="@color/SkyBlue"
         android:id="@+id/buttonTower"
-        android:layout_marginBottom="78dp"
+        android:layout_marginBottom="86dp"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/moneyTextView"
-        android:layout_toStartOf="@+id/moneyTextView" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Money"
+        android:text="Money: "
         android:textColor="@color/yellow"
         android:id="@+id/moneyTextView"
         android:layout_alignTop="@+id/buttonTower"
@@ -34,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Enemy killed"
+        android:text="State: "
         android:textColor="@color/red"
         android:id="@+id/enemyKilledTextView"
         android:layout_below="@+id/moneyTextView"
@@ -45,10 +47,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Player"
+        android:text="Player: "
         android:textColor="@color/green"
         android:id="@+id/playerTextView"
         android:layout_above="@+id/moneyTextView"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="99dp"
+        android:layout_marginEnd="99dp" />
 
 </RelativeLayout>

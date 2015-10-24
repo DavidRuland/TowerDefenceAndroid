@@ -20,6 +20,7 @@ public class MainMenuFragment extends Fragment {
     TextView welcome,tPlay;
     GameScreenFragment gameScreenFragment;
     optionsFragment oF;
+  boolean play=false;
 
     public MainMenuFragment() {
         // Required empty public constructor
@@ -44,12 +45,21 @@ public class MainMenuFragment extends Fragment {
                 FragmentTransaction ft = fm.beginTransaction();
                 ft.replace(R.id.fragmentContainer, gameScreenFragment);
                 ft.addToBackStack(null);
+
                 if(oF.checkBoxOn.isChecked()){
+                    play=true;
                     oF.mySound.start();
+
                 }
                 if(oF.checkBoxOff.isChecked()){
+                    play=false;
                     oF.mySound.stop();
+
                 }
+               if(!play){
+                    oF.mySound.start();
+                }
+
                 ft.commit();
             }
         });
