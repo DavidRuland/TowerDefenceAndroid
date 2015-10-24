@@ -56,9 +56,7 @@ public class MainMenuFragment extends Fragment {
                     oF.mySound.stop();
 
                 }
-               if(!play){
-                    oF.mySound.start();
-                }
+
 
                 ft.commit();
             }

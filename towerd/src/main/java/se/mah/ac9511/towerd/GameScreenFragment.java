@@ -22,7 +22,7 @@ public class GameScreenFragment extends Fragment {
     //A vector is like an ArrayList a little bit slower but Thread-safe. This means that it can handle concurrent changes.
     TextView tUser,tMoney,tState;
     Button pTower;
-    userTest uTest;
+    User user;
    String money;
 
 
@@ -42,11 +42,11 @@ public class GameScreenFragment extends Fragment {
         tState=(TextView)v.findViewById(R.id.enemyKilledTextView);
         pTower=(Button)v.findViewById(R.id.buttonTower);
 
-        uTest=new userTest("Player 1",0,0,userTest.Action.IDLE,5000);
-        money= String.valueOf(uTest.getMoney());
+        user=new User("Player 1",0,0,User.Action.IDLE,5000);
+        money= String.valueOf(user.getMoney());
         tMoney.setText(money);
-        tUser.setText(uTest.getId());
-        tState.setText(uTest.getPriority().toString());
+        tUser.setText(user.getId());
+        tState.setText(user.getPriority().toString());
         return v;
     }
 
