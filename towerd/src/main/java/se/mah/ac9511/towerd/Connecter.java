@@ -193,6 +193,11 @@ public class Connecter {
         UpdateNodeXY(shortcut, x, y);
     }
 
+    public void UpdateAction(Action a)
+    {
+        UpdateNodeInt (shortcut,"Action", a.ordinal());
+    }
+
     public void UpdateIntValue(ToUpdate task,int value)
     {
         switch (task)
@@ -221,7 +226,7 @@ public class Connecter {
         }
     }
 
-    
+
 
     /*Action StringToEnum(String value)
     {
@@ -311,9 +316,9 @@ public class Connecter {
         return s;
     }*/
 
-    private void EnterLobby(Firebase node)
+    public void EnterLobby(Firebase node)
     {
-        AttachLobbyListeners(node);
+        AttachLobbyListeners();
         if(!IfTheresRoom(playerName,node))
         {
             System.out.println("No room in lobby");
@@ -327,7 +332,7 @@ public class Connecter {
             if(players[i].equals("nullinull"))
             {
                 playerNr = i;
-                UpdateNodeStr(PlayerNumToStr(i)+"/","name",mMyPlayerName);
+                UpdateNodeStr( "Lobby/"+i,"name",mMyPlayerName);
                 shortcut = "Game/"+Integer.toString(playerNr);
                 AttachListeners(mMainConnectionRef.child(shortcut));
                 return true;
@@ -341,15 +346,39 @@ public class Connecter {
 
     }
 
-    private void AttachLobbyListeners(Firebase node)
+    private void AttachLobbyListeners()
     {
-        node.addValueEventListener(new ValueEventListener()
-        {
+        for (int i = 0; i < 4; i++) {
+            final int j = i;
+            mMainConnectionRef.child("lobby").child(Integer.toString(i)).child("Name").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    playerName[j] = snapshot.getValue().toString();
+                }
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                    System.out.println("The read failed" + firebaseError.getMessage());
+                }
+            });
+            mMainConnectionRef.child("lobby").child(Integer.toString(i)).child("Ready").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    playerReady[j] = (Boolean) snapshot.getValue();
+                }
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                    System.out.println("The read failed" + firebaseError.getMessage());
+                }
+            });
+        }
+       /* mMainConnectionRef.child("lobby").child("0").child("name").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot)
-            {
+            public void onDataChange(DataSnapshot snapshot) {
                 playerName[0] = snapshot.getValue().toString();
             }
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed" + firebaseError.getMessage());
@@ -438,16 +467,23 @@ public class Connecter {
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed" + firebaseError.getMessage());
             }
-        });
+        });*/
 
 
 
     }
 
-    private void MakeReady(boolean[] playerReady, Firebase node)
+    public void ReadyFlipFlop(boolean[] playerReady, Firebase node)
     {
-        UpdateNodeBool("lobby/" + playerNr,"ready", (boolean)playerReady[playerNr]);
-        //other stuff
+        if(!playerReady[playerNr])
+        {
+            playerReady[playerNr] = true;
+        }
+        else
+        {
+            playerReady[playerNr] = false;
+        }
+        UpdateNodeBool("lobby/" + playerNr, "ready", (boolean) playerReady[playerNr]);
     }
 
     private void SetGameOtions()
