@@ -1,12 +1,17 @@
 package se.mah.ac9511.towerd;
 
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,7 +37,10 @@ public class GameScreenFragment extends Fragment {
     Button pTower;
     User user;
    String Gold;
+    int x,y;
    Connecter c;
+    private Paint paint = new Paint();
+    private Path path = new Path();
 
     private Firebase myFirebaseRef;
 
@@ -48,16 +56,28 @@ public class GameScreenFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v=inflater.inflate(R.layout.fragment_game_screen, container, false);
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(6f);
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.ROUND);
         Firebase.setAndroidContext(this.getContext());
         myFirebaseRef = new Firebase("https://blistering-heat-6102.firebaseio.com/");
         c=new Connecter(myFirebaseRef);
          myFirebaseRef.child("Game/0");
-        user=new User("Player 1",100,100,Action.IDLE,Gold);
+        user=new User("Player 1",100,100,Action.IDLE,Gold,Color.BLUE);
         c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
         tUser=(TextView)v.findViewById(R.id.playerTextView);
         tMoney=(TextView)v.findViewById(R.id.moneyTextView);
         tState=(TextView)v.findViewById(R.id.enemyKilledTextView);
         pTower=(Button)v.findViewById(R.id.buttonTower);
+        v.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                HandleTouch(event);
+                return true;
+            }
+        });
         pTower.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,5 +156,45 @@ public class GameScreenFragment extends Fragment {
         return v;
     }
 
+    private void HandleTouch(MotionEvent event) {
+        final int actionPeformed = event.getAction();
 
-}
+        switch (actionPeformed) {
+            case MotionEvent.ACTION_DOWN: {
+
+                x = (int) event.getX();
+                y = (int) event.getY();
+                user.setxPos(x);
+                user.setyPos(y);
+                c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
+                Log.i("ACTION_DOWN","Resultat: "+x+","+y);
+                break;
+            }
+
+            case MotionEvent.ACTION_MOVE: {
+                x = (int) event.getX();
+                y = (int) event.getY();
+                user.setxPos(x);
+                user.setyPos(y);
+                user.setColor(Color.GREEN);
+
+
+                c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
+                Log.i("ACTION_MOVE","Resultat: "+x+","+y);
+                break;
+            }
+        }
+    }
+
+    public void onDraw(Canvas canvas) {
+
+            paint.setStyle(Paint.Style.FILL);
+
+       // canvas.drawCircle(x, y, ,paint);
+            paint.setStyle(Paint.Style.STROKE);
+
+        }
+    }
+
+
+
