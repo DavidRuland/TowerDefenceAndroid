@@ -18,6 +18,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.util.Random;
 import java.util.Vector;
 
 
@@ -31,7 +32,7 @@ public class GameScreenFragment extends Fragment {
     Button pTower;
     User user;
    String Gold;
-
+   Connecter c;
 
     private Firebase myFirebaseRef;
 
@@ -49,15 +50,23 @@ public class GameScreenFragment extends Fragment {
         View v=inflater.inflate(R.layout.fragment_game_screen, container, false);
         Firebase.setAndroidContext(this.getContext());
         myFirebaseRef = new Firebase("https://blistering-heat-6102.firebaseio.com/");
-       myFirebaseRef.child("Game/0");
-
-
+        c=new Connecter(myFirebaseRef);
+         myFirebaseRef.child("Game/0");
+        user=new User("Player 1",100,100,Action.IDLE,Gold);
+        c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
         tUser=(TextView)v.findViewById(R.id.playerTextView);
         tMoney=(TextView)v.findViewById(R.id.moneyTextView);
         tState=(TextView)v.findViewById(R.id.enemyKilledTextView);
         pTower=(Button)v.findViewById(R.id.buttonTower);
-        user=new User("Player 1",0,0,User.Action.IDLE,Gold);
-
+        pTower.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Random r = new Random();
+                user.setxPos(r.nextInt(300));
+                user.setyPos(r.nextInt(600));
+                c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
+            }
+        });
         tUser.setText(user.getId());
         tState.setText(user.getPriority().toString());
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
@@ -65,7 +74,11 @@ public class GameScreenFragment extends Fragment {
             public void onDataChange(DataSnapshot snapshot) {
                 Log.i("There are ","Items: " + snapshot.getChildrenCount());
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    Gold=postSnapshot.child("Gold").getKey();
+                    Gold= (String)postSnapshot.child("Game/0/Gold").getValue();
+                   // snapshot.getValue();
+                    Log.i("Snapshot",snapshot.child("Game/0/Gold").getValue().toString());
+                   //Gold= String.valueOf(myFirebaseRef.child(postSnapshot.getKey()).child("Gold"));
+                    //myFirebaseRef.child(postSnapshot.getKey()).child("Gold").setValue((int)postSnapshot.getValue()+50);
                     tMoney.setText(Gold);
 
 
@@ -87,7 +100,11 @@ public class GameScreenFragment extends Fragment {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot snapshot, String previousChildKey) {
+            public void onChildChanged(DataSnapshot arg0, String arg) {
+
+
+
+                }
 
 
 
@@ -98,7 +115,7 @@ public class GameScreenFragment extends Fragment {
 
 
 
-            }
+
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {

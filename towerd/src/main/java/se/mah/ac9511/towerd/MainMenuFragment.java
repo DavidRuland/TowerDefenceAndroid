@@ -46,27 +46,30 @@ public class MainMenuFragment extends Fragment {
                 ft.replace(R.id.fragmentContainer, gameScreenFragment);
                 ft.addToBackStack(null);
 
-                if(oF.checkBoxOn.isChecked()){
-                    play=true;
-                    oF.mySound.start();
+             if(oF.checkBoxOn.isChecked()){
+                  play=true;
+                  oF.mySound.start();
 
-                }
-                if(oF.checkBoxOff.isChecked()){
-                    play=false;
+              }
+               if(oF.checkBoxOff.isChecked()){
+                   play=false;
+                   oF.mySound.stop();
+
+              }
+                if(!play){
                     oF.mySound.stop();
-
                 }
-
 
                 ft.commit();
             }
         });
+
         btnOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager fm = getFragmentManager();
-                oF = new optionsFragment();
                 FragmentTransaction ft = fm.beginTransaction();
+                oF = new optionsFragment();
                 ft.replace(R.id.fragmentContainer, oF);
                 ft.addToBackStack(null);
                 ft.commit();
