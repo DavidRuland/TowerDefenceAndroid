@@ -19,7 +19,8 @@ public class MainMenuFragment extends Fragment {
     Button btnPlay,btnOptions,btnExit;
     TextView welcome,tPlay;
     GameScreenFragment gameScreenFragment;
-    optionsFragment oF;
+    LobbyFragment lobbyFragment;
+   // optionsFragment oF;
   boolean play=false;
 
     public MainMenuFragment() {
@@ -41,24 +42,24 @@ public class MainMenuFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentManager fm = getFragmentManager();
-                gameScreenFragment = new GameScreenFragment();
+                lobbyFragment = new LobbyFragment();
                 FragmentTransaction ft = fm.beginTransaction();
-                ft.replace(R.id.fragmentContainer, gameScreenFragment);
+                ft.replace(R.id.fragmentContainer, lobbyFragment);
                 ft.addToBackStack(null);
 
-             if(oF.checkBoxOn.isChecked()){
-                  play=true;
-                  oF.mySound.start();
-
-              }
-               if(oF.checkBoxOff.isChecked()){
-                   play=false;
-                   oF.mySound.stop();
-
-              }
-                if(!play){
-                    oF.mySound.stop();
-                }
+//             if(oF.checkBoxOn.isChecked()){
+//                  play=true;
+//                  oF.mySound.start();
+//
+//              }
+//               if(oF.checkBoxOff.isChecked()){
+//                   play=false;
+//                   oF.mySound.stop();
+//
+//              }
+//                if(!play){
+//                    oF.mySound.stop();
+//                }
 
                 ft.commit();
             }
@@ -67,12 +68,12 @@ public class MainMenuFragment extends Fragment {
         btnOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fm = getFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                oF = new optionsFragment();
-                ft.replace(R.id.fragmentContainer, oF);
-                ft.addToBackStack(null);
-                ft.commit();
+//                FragmentManager fm = getFragmentManager();
+//                FragmentTransaction ft = fm.beginTransaction();
+//                oF = new optionsFragment();
+//                ft.replace(R.id.fragmentContainer, oF);
+//                ft.addToBackStack(null);
+//                ft.commit();
 
             }
         });

@@ -58,9 +58,8 @@ public class GameScreenFragment extends Fragment {
         View v=inflater.inflate(R.layout.fragment_game_screen, container, false);
         paint.setAntiAlias(true);
         paint.setStrokeWidth(6f);
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setColor(Color.BLUE);
+
         Firebase.setAndroidContext(this.getContext());
         myFirebaseRef = new Firebase("https://blistering-heat-6102.firebaseio.com/");
         c=new Connecter(myFirebaseRef);
@@ -167,7 +166,10 @@ public class GameScreenFragment extends Fragment {
                 user.setxPos(x);
                 user.setyPos(y);
                 c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
-                Log.i("ACTION_DOWN","Resultat: "+x+","+y);
+                Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
+                Canvas canvas=new Canvas();
+                canvas.drawColor(Color.BLACK);
+                canvas.drawCircle(event.getX(), event.getY(), 50, paint);
                 break;
             }
 
@@ -177,6 +179,9 @@ public class GameScreenFragment extends Fragment {
                 user.setxPos(x);
                 user.setyPos(y);
                 user.setColor(Color.GREEN);
+                Canvas canvas=new Canvas();
+                canvas.drawColor(Color.BLACK);
+                canvas.drawCircle(event.getX(), event.getY(), 50, paint);
 
 
                 c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
@@ -189,8 +194,7 @@ public class GameScreenFragment extends Fragment {
     public void onDraw(Canvas canvas) {
 
             paint.setStyle(Paint.Style.FILL);
-
-       // canvas.drawCircle(x, y, ,paint);
+          canvas.drawCircle(x, y,50 ,paint);
             paint.setStyle(Paint.Style.STROKE);
 
         }
