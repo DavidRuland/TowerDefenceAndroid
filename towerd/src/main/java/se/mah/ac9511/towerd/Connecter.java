@@ -23,10 +23,21 @@ enum Action
     BUILDTOWER4
 }
 
+enum ToUpdate
+{
+    GOLD,
+    KILLS,
+    LIVES_LEFT,
+    SCORE,
+    IS_ALIVE,
+    ACTION
+}
+
 public class Connecter {
 
     //String mMainConnection;
     private Firebase mMainConnectionRef;
+    private String shortcut;
     private Firebase playerRef = new Firebase("https://vivid-heat-894.firebaseio.com/player1");//Lek värde
     private double mGold = 0;
     private double mKills;
@@ -41,7 +52,7 @@ public class Connecter {
 
 
 
-    public Connecter(Firebase mainConnectionRef)
+    public Connecter(Firebase mainConnectionRef, String myPlayerName)
     {
         this.mMainConnectionRef = mainConnectionRef;
         mGold = 0;
@@ -51,27 +62,20 @@ public class Connecter {
         action = Action.IDLE;//se till att denna är idle från början.
         playerName = new String[4];
         playerReady = new Boolean[4];
+        mMyPlayerName = myPlayerName;
     }
 
     //region UpdateNode
-    private void UpdateNodeXY(String path, int X, int Y)
+    private void UpdateNodeXY(String path, int x, int y)
     {
         Firebase place = mMainConnectionRef.child(path);
         Map<String, Object> putInt = new HashMap<String, Object>();
-        int[] arr = new int[2];arr[0] = X; arr[1] = Y;
-        putInt.put("Position", arr);
+        String numbers = Integer.toString(x)+","+Integer.toString(y);
+        putInt.put("Position", numbers);
         place.updateChildren(putInt);
     }
 
-    void UpdateNodeStr(String path, String nodeName, String value)
-    {
-        Firebase place = mMainConnectionRef.child(path);
-        Map<String, Object> putInt = new HashMap<String, Object>();
-        putInt.put(nodeName, value);
-        place.updateChildren(putInt);
-    }
-
-    void UpdateNodeInt(String path, String nodeName, int value)
+    private void UpdateNodeStr(String path, String nodeName, String value)
     {
         Firebase place = mMainConnectionRef.child(path);
         Map<String, Object> putInt = new HashMap<String, Object>();
@@ -79,7 +83,7 @@ public class Connecter {
         place.updateChildren(putInt);
     }
 
-    void UpdateNodeInt(String path, String nodeName, double value)
+   private void UpdateNodeInt(String path, String nodeName, int value)
     {
         Firebase place = mMainConnectionRef.child(path);
         Map<String, Object> putInt = new HashMap<String, Object>();
@@ -87,7 +91,15 @@ public class Connecter {
         place.updateChildren(putInt);
     }
 
-    void UpdateNodeBool(String path, String nodeName, boolean value)
+    private void UpdateNodeInt(String path, String nodeName, double value)
+    {
+        Firebase place = mMainConnectionRef.child(path);
+        Map<String, Object> putInt = new HashMap<String, Object>();
+        putInt.put(nodeName, value);
+        place.updateChildren(putInt);
+    }
+
+    private void UpdateNodeBool(String path, String nodeName, boolean value)
     {
         Firebase place = mMainConnectionRef.child(path);
         Map<String, Object> putBool = new HashMap<String, Object>();
@@ -96,9 +108,9 @@ public class Connecter {
     }
     //endregion
 
-    void AttachListeners(Firebase node)
+    private void AttachListeners(Firebase node)
     {
-        node.addValueEventListener(new ValueEventListener()
+        node.child("Gold").addValueEventListener(new ValueEventListener()
         {
             @Override
         public void onDataChange(DataSnapshot snapshot)
@@ -113,7 +125,7 @@ public class Connecter {
         }
         });
 
-        node.addValueEventListener(new ValueEventListener()
+        node.child("Kills").addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot snapshot)
@@ -128,7 +140,7 @@ public class Connecter {
             }
         });
 
-        node.addValueEventListener(new ValueEventListener()
+        node.child("LivesLeft").addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot snapshot)
@@ -143,7 +155,7 @@ public class Connecter {
             }
         });
 
-        node.addValueEventListener(new ValueEventListener()
+        node.child("Score").addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot snapshot)
@@ -158,7 +170,7 @@ public class Connecter {
             }
         });
 
-        node.addValueEventListener(new ValueEventListener()
+        node.child("action").addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot snapshot)
@@ -175,6 +187,41 @@ public class Connecter {
 
 
     }
+
+    public void UpdatePosition(int x,int y)
+    {
+        UpdateNodeXY(shortcut, x, y);
+    }
+
+    public void UpdateIntValue(ToUpdate task,int value)
+    {
+        switch (task)
+        {
+            case GOLD:
+                UpdateNodeStr(shortcut,"Gold",Integer.toString(value));
+                break;
+            case KILLS:
+                UpdateNodeStr(shortcut,"Kills",Integer.toString(value));
+                break;
+            case LIVES_LEFT:
+                UpdateNodeStr(shortcut,"LivesLeft",Integer.toString(value));
+                break;
+            case SCORE:
+                UpdateNodeStr(shortcut,"Score",Integer.toString(value));
+                break;
+            case IS_ALIVE:
+                UpdateNodeStr(shortcut,"IsAlive",Integer.toString(value));
+                break;
+            /*case ACTION:
+                //UpdateNodeStr("Game/"+Integer.toString(playerNr),"Action",Integer.toString(value));
+                break;*/
+            default:
+                System.out.println("Error Has ocuured in Connecter; UpdateIntValue");
+                break;
+        }
+    }
+
+    
 
     /*Action StringToEnum(String value)
     {
@@ -220,7 +267,7 @@ public class Connecter {
         return s;
     }*/
 
-    private String PlayerNumToStr(int value)
+    /*private String PlayerNumToStr(int value)
     {
         String s = "nullinull";
         switch (value)
@@ -240,9 +287,9 @@ public class Connecter {
                 break;
         }
         return s;
-    }
+    }*/
 
-    private String PlayerReadyToStr(int value)
+    /*private String PlayerReadyToStr(int value)
     {
         String s = "nullinull";
         switch (value)
@@ -262,7 +309,7 @@ public class Connecter {
                 break;
         }
         return s;
-    }
+    }*/
 
     private void EnterLobby(Firebase node)
     {
@@ -281,6 +328,8 @@ public class Connecter {
             {
                 playerNr = i;
                 UpdateNodeStr(PlayerNumToStr(i)+"/","name",mMyPlayerName);
+                shortcut = "Game/"+Integer.toString(playerNr);
+                AttachListeners(mMainConnectionRef.child(shortcut));
                 return true;
             }
         }
