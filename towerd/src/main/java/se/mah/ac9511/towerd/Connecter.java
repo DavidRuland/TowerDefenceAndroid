@@ -4,23 +4,30 @@ package se.mah.ac9511.towerd;
  * Created by Peter on 2015-10-26.
  */
 
+import android.support.annotation.NonNull;
+
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 enum Action
 {
     IDLE,
     OK,
-    FAILD,
-    BUILDTOWER1,
-    BUILDTOWER2,
-    BUILDTOWER3,
-    BUILDTOWER4
+    FAILED,
+    BUILD_TOWER_1,
+    BUILD_TOWER_2,
+    BUILD_TOWER_3,
+    BUILD_TOWER_4
 }
 
 enum ToUpdate
@@ -30,25 +37,34 @@ enum ToUpdate
     LIVES_LEFT,
     SCORE,
     IS_ALIVE,
-    ACTION
 }
 
 public class Connecter {
 
     //String mMainConnection;
     private Firebase mMainConnectionRef;
-    private String shortcut;
+    private String mShortcut;
+    private boolean mInLobby;
     private Firebase playerRef = new Firebase("https://vivid-heat-894.firebaseio.com/player1");//Lek värde
     private double mGold = 0;
     private double mKills;
     private double mScore;
     private double mLivesLeft;
     private boolean mIsLobbyHost;
+
     private int playerNr;
     private Action action;
     private String[] playerName;
-    private Boolean[] playerReady;
+    private boolean[] mPlayerReady;
     private String mMyPlayerName;
+    //private List<ValueEventListener> mValueEeventListenerList;
+    private List<ListenerMemory> mListenerMemory;
+
+
+    public int GetPlayerNuber()
+    {
+        return playerNr;
+    }
 
 
 
@@ -61,8 +77,12 @@ public class Connecter {
         mLivesLeft = 0;
         action = Action.IDLE;//se till att denna är idle från början.
         playerName = new String[4];
-        playerReady = new Boolean[4];
+        mPlayerReady = new boolean[4];
         mMyPlayerName = myPlayerName;
+        //mValueEeventListenerList = new ArrayList<>();
+        mListenerMemory = new ArrayList<>();
+        playerNr = 9999;
+        mInLobby = false;
     }
 
     //region UpdateNode
@@ -91,7 +111,7 @@ public class Connecter {
         place.updateChildren(putInt);
     }
 
-    private void UpdateNodeInt(String path, String nodeName, double value)
+    private void UpdateNodeDouble(String path, String nodeName, double value)
     {
         Firebase place = mMainConnectionRef.child(path);
         Map<String, Object> putInt = new HashMap<String, Object>();
@@ -110,27 +130,10 @@ public class Connecter {
 
     private void AttachListeners(Firebase node)
     {
-        node.child("Gold").addValueEventListener(new ValueEventListener()
-        {
+        mListenerMemory.add(new ListenerMemory(node.child("Gold"), node.child("Gold").addValueEventListener(new ValueEventListener() {
             @Override
-        public void onDataChange(DataSnapshot snapshot)
-            {
-                mGold = (double)snapshot.getValue();
-            }
-
-
-        @Override
-        public void onCancelled(FirebaseError firebaseError) {
-            System.out.println("The read failed" + firebaseError.getMessage());
-        }
-        });
-
-        node.child("Kills").addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(DataSnapshot snapshot)
-            {
-                mKills = (double)snapshot.getValue();
+            public void onDataChange(DataSnapshot snapshot) {
+                mGold = (double) snapshot.getValue();
             }
 
 
@@ -138,14 +141,12 @@ public class Connecter {
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed" + firebaseError.getMessage());
             }
-        });
+        })));
 
-        node.child("LivesLeft").addValueEventListener(new ValueEventListener()
-        {
+        mListenerMemory.add(new ListenerMemory(node.child("Kills"), node.child("Kills").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot)
-            {
-                mLivesLeft = (double)snapshot.getValue();
+            public void onDataChange(DataSnapshot snapshot) {
+                mKills = (double) snapshot.getValue();
             }
 
 
@@ -153,14 +154,12 @@ public class Connecter {
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed" + firebaseError.getMessage());
             }
-        });
+        })));
 
-        node.child("Score").addValueEventListener(new ValueEventListener()
-        {
+        mListenerMemory.add(new ListenerMemory(node.child("LivesLeft"), node.child("LivesLeft").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot)
-            {
-                mScore = (double)snapshot.getValue();
+            public void onDataChange(DataSnapshot snapshot) {
+                mLivesLeft = (double) snapshot.getValue();
             }
 
 
@@ -168,13 +167,24 @@ public class Connecter {
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed" + firebaseError.getMessage());
             }
-        });
+        })));
 
-        node.child("action").addValueEventListener(new ValueEventListener()
-        {
+        mListenerMemory.add(new ListenerMemory(node.child("Score"), node.child("Score").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot)
-            {
+            public void onDataChange(DataSnapshot snapshot) {
+                mScore = (double) snapshot.getValue();
+            }
+
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed" + firebaseError.getMessage());
+            }
+        })));
+
+        mListenerMemory.add(new ListenerMemory(node.child("action"), node.child("action").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
                 action = (Action) snapshot.getValue();
             }
 
@@ -183,19 +193,19 @@ public class Connecter {
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed" + firebaseError.getMessage());
             }
-        });
+        })));
 
 
     }
 
     public void UpdatePosition(int x,int y)
     {
-        UpdateNodeXY(shortcut, x, y);
+        UpdateNodeXY(mShortcut, x, y);
     }
 
     public void UpdateAction(Action a)
     {
-        UpdateNodeInt (shortcut,"Action", a.ordinal());
+        UpdateNodeInt(mShortcut, "Action", a.ordinal());
     }
 
     public void UpdateIntValue(ToUpdate task,int value)
@@ -203,32 +213,188 @@ public class Connecter {
         switch (task)
         {
             case GOLD:
-                UpdateNodeStr(shortcut,"Gold",Integer.toString(value));
+                UpdateNodeStr(mShortcut,"Gold",Integer.toString(value));
                 break;
             case KILLS:
-                UpdateNodeStr(shortcut,"Kills",Integer.toString(value));
+                UpdateNodeStr(mShortcut,"Kills",Integer.toString(value));
                 break;
             case LIVES_LEFT:
-                UpdateNodeStr(shortcut,"LivesLeft",Integer.toString(value));
+                UpdateNodeStr(mShortcut,"LivesLeft",Integer.toString(value));
                 break;
             case SCORE:
-                UpdateNodeStr(shortcut,"Score",Integer.toString(value));
+                UpdateNodeStr(mShortcut,"Score",Integer.toString(value));
                 break;
             case IS_ALIVE:
-                UpdateNodeStr(shortcut,"IsAlive",Integer.toString(value));
+                UpdateNodeStr(mShortcut,"IsAlive",Integer.toString(value));
                 break;
-            /*case ACTION:
-                //UpdateNodeStr("Game/"+Integer.toString(playerNr),"Action",Integer.toString(value));
-                break;*/
             default:
-                System.out.println("Error Has ocuured in Connecter; UpdateIntValue");
+                System.out.println("Error Has occurred in Connector; UpdateIntValue");
                 break;
         }
     }
 
+    public void EnterLobby()
+    {
+        AttachLobbyListeners();
+        if(mInLobby = ThereIsRoom(playerName))
+        {
+            AttachListeners(mMainConnectionRef.child(mShortcut));
+        }
+        else
+        {
+            System.out.println("No room in lobby");
+            ExitLobby();
+        }
+    }
 
+    private boolean ThereIsRoom(String[] players)
+    {
+        for (int i = 0; i < players.length; i++) {
+            if(players[i].equals("Empty"))
+            {
+                playerNr = i;
+                UpdateNodeStr( "Lobby/"+i,"name",mMyPlayerName);
+                mShortcut = "Game/"+Integer.toString(playerNr);
+                return true;
+            }
+        }
+        return false;
+    }
 
-    /*Action StringToEnum(String value)
+    public void ExitLobby()
+    {
+        RemoveLobbyListeners();
+        if(mInLobby)
+        {
+            UpdateNodeStr( "Lobby/"+playerNr,"name","Empty");
+            if(mPlayerReady[playerNr])
+            {
+                ReadyFlipFlop(mPlayerReady,playerNr);
+            }
+        }
+    }
+
+    private void RemoveLobbyListeners()
+    {
+        for (ListenerMemory listener: mListenerMemory
+             ) {
+            listener.getLocation().removeEventListener(listener.getListener());
+        }
+    }
+
+    private void AttachLobbyListeners()
+    {
+        for (int i = 0; i < 4; i++) {
+            final int j = i;
+            Firebase ref = mMainConnectionRef.child("lobby").child(Integer.toString(i)).child("Name");
+            mListenerMemory.add(new ListenerMemory(ref, ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            playerName[j] = snapshot.getValue().toString();
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+                            System.out.println("The read failed" + firebaseError.getMessage());
+                        }
+                    })));
+            ref = mMainConnectionRef.child("lobby").child(Integer.toString(i)).child("Ready");
+            mListenerMemory.add(new ListenerMemory(ref,ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    mPlayerReady[j] = (Boolean) snapshot.getValue();
+                }
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                    System.out.println("The read failed" + firebaseError.getMessage());
+                }
+            })));
+        }
+    }
+
+    public void ReadyFlipFlop(boolean[] playerReady, int playernumber)
+    {
+        if(playerReady[playernumber])
+        {
+            playerReady[playernumber] = false;
+        }
+        else
+        {
+            playerReady[playernumber] = true;
+        }
+        UpdateNodeBool("lobby/" + playernumber, "Ready", playerReady[playernumber]);
+    }
+
+    private void SetGameOtions()
+    {
+
+    }
+
+    void IsReadyToPlay()
+    {
+
+    }
+
+    void populateFilds()
+    {
+
+    }
+
+    /** lobby
+     *          player1
+     *              Name
+     *              Ready
+     *          player2
+     *              Name
+     *              Ready
+     *          player3
+     *              Name
+     *              Ready
+     *          player4
+     *              Name
+     *              Ready
+     *      Options
+     *          numberOfLives
+     *          difficulty
+     *          handicap?
+     *
+     *  Game
+     *      player1  <--Actual name on firebase :0
+     *          Position
+     *              X
+     *              Y
+     *          Kills
+     *          LivesLeft
+     *          Gold
+     *          Score
+     *          IsAlive
+     *          Action
+     *             enum value range {
+     *             IDLE
+     *             OK
+     *             FAILED
+     *             BUILD_TOWER_1
+     *             BUILD_TOWER_2
+     *             BUILD_TOWER_3
+     *             BUILD_TOWER_4} <-- Actually just numbers from 0-6
+     *     player2  <--Actual name on firebase :1
+     *          ...
+     *
+     *
+     *
+     *
+     *          Launch Game
+     *          Options
+     *          lobby host.
+     *          populate fields.
+     *          */
+
+}
+
+////////////////////////Junkyard/////////////////////////////7
+
+   /*Action StringToEnum(String value)
     {
         Action ac = Action.nullinull;
         switch (value)
@@ -316,64 +482,7 @@ public class Connecter {
         return s;
     }*/
 
-    public void EnterLobby(Firebase node)
-    {
-        AttachLobbyListeners();
-        if(!IfTheresRoom(playerName,node))
-        {
-            System.out.println("No room in lobby");
-            ExitLobby();
-        }
-    }
-
-    private boolean IfTheresRoom(String[] players, Firebase node)
-    {
-        for (int i = 0; i < players.length; i++) {
-            if(players[i].equals("nullinull"))
-            {
-                playerNr = i;
-                UpdateNodeStr( "Lobby/"+i,"name",mMyPlayerName);
-                shortcut = "Game/"+Integer.toString(playerNr);
-                AttachListeners(mMainConnectionRef.child(shortcut));
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void ExitLobby()
-    {
-
-    }
-
-    private void AttachLobbyListeners()
-    {
-        for (int i = 0; i < 4; i++) {
-            final int j = i;
-            mMainConnectionRef.child("lobby").child(Integer.toString(i)).child("Name").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    playerName[j] = snapshot.getValue().toString();
-                }
-
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
-                    System.out.println("The read failed" + firebaseError.getMessage());
-                }
-            });
-            mMainConnectionRef.child("lobby").child(Integer.toString(i)).child("Ready").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    playerReady[j] = (Boolean) snapshot.getValue();
-                }
-
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
-                    System.out.println("The read failed" + firebaseError.getMessage());
-                }
-            });
-        }
-       /* mMainConnectionRef.child("lobby").child("0").child("name").addValueEventListener(new ValueEventListener() {
+ /* mMainConnectionRef.child("lobby").child("0").child("name").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 playerName[0] = snapshot.getValue().toString();
@@ -468,77 +577,3 @@ public class Connecter {
                 System.out.println("The read failed" + firebaseError.getMessage());
             }
         });*/
-
-
-
-    }
-
-    public void ReadyFlipFlop(boolean[] playerReady, Firebase node)
-    {
-        if(!playerReady[playerNr])
-        {
-            playerReady[playerNr] = true;
-        }
-        else
-        {
-            playerReady[playerNr] = false;
-        }
-        UpdateNodeBool("lobby/" + playerNr, "ready", (boolean) playerReady[playerNr]);
-    }
-
-    private void SetGameOtions()
-    {
-
-    }
-
-    void IsReadyToPlay()
-    {
-
-    }
-
-    void populateFilds()
-    {
-
-    }
-
-    /** lobby
-     *          player1
-     *              name
-     *              ready
-     *          player2
-     *              name
-     *              ready
-     *          player3
-     *              name
-     *              ready
-     *          player4
-     *              name
-     *              ready
-     *      Options
-     *          numberOfLives
-     *          difficulty
-     *          handicap?
-     *
-     *  Game
-     *      player1
-     *          position
-     *              X
-     *              Y
-     *          kills
-     *          livesLeft
-     *          gold
-     *          score
-     *          isAlive
-     *          Action
-     *              buildTower
-     *              statusOk
-     *              statusFailed
-     *              statusIdle
-     *     player2
-     *
-     * Is more logical if gameServer populates the fields.
-     *          */
-
-}
-
-
