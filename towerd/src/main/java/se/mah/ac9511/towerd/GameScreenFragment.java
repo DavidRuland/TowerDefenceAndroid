@@ -1,10 +1,13 @@
 package se.mah.ac9511.towerd;
 
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +15,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,6 +28,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
 
@@ -36,13 +42,15 @@ public class GameScreenFragment extends Fragment {
     TextView tUser,tMoney,tState;
     Button pTower;
     User user;
-   String Gold;
+   int Gold;
     int x,y;
    Connecter c;
-    private Paint paint = new Paint();
-    private Path path = new Path();
-
+    SurfaceView surfaceView;
+    private SurfaceHolder holder;
     private Firebase myFirebaseRef;
+    Paint paint;
+    Canvas canvas;
+
 
 
 
@@ -55,22 +63,32 @@ public class GameScreenFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v=inflater.inflate(R.layout.fragment_game_screen, container, false);
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(6f);
-        paint.setColor(Color.BLUE);
 
+        View v=inflater.inflate(R.layout.fragment_game_screen, container, false);
+        InitializeFirebaseValue(v);
+
+       return v;
+        //return new CustomView(this.getActivity());
+    }
+    private void InitializeFirebaseValue(View v)
+    {
+        surfaceView=(SurfaceView)v.findViewById(R.id.surfaceView);
+        holder=surfaceView.getHolder();
         Firebase.setAndroidContext(this.getContext());
         myFirebaseRef = new Firebase("https://blistering-heat-6102.firebaseio.com/");
-        c=new Connecter(myFirebaseRef);
-         myFirebaseRef.child("Game/0");
         user=new User("Player 1",100,100,Action.IDLE,Gold,Color.BLUE);
+
+        //c.UpdateIntValue(ToUpdate.GOLD,user.getMoney());
+        c=new Connecter(myFirebaseRef,user.getId());
+        myFirebaseRef.child("Game/0");
         c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
+
         tUser=(TextView)v.findViewById(R.id.playerTextView);
         tMoney=(TextView)v.findViewById(R.id.moneyTextView);
         tState=(TextView)v.findViewById(R.id.enemyKilledTextView);
+        //tMoney.setText(Integer.toString(Gold));
         pTower=(Button)v.findViewById(R.id.buttonTower);
-        v.setOnTouchListener(new View.OnTouchListener() {
+        surfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 HandleTouch(event);
@@ -93,47 +111,30 @@ public class GameScreenFragment extends Fragment {
             public void onDataChange(DataSnapshot snapshot) {
                 Log.i("There are ","Items: " + snapshot.getChildrenCount());
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    Gold= (String)postSnapshot.child("Game/0/Gold").getValue();
-                   // snapshot.getValue();
+                    //Gold= (String)postSnapshot.child("Game/0/Gold").getValue();
+                    // snapshot.getValue();
                     Log.i("Snapshot",snapshot.child("Game/0/Gold").getValue().toString());
-                   //Gold= String.valueOf(myFirebaseRef.child(postSnapshot.getKey()).child("Gold"));
+                    //Gold= String.valueOf(myFirebaseRef.child(postSnapshot.getKey()).child("Gold"));
                     //myFirebaseRef.child(postSnapshot.getKey()).child("Gold").setValue((int)postSnapshot.getValue()+50);
-                    tMoney.setText(Gold);
-
-
-
+                    //tMoney.setText(Gold);
                 }
             }
-
             @Override
+
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
-
         myFirebaseRef.addChildEventListener(new ChildEventListener() {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
             }
-
             @Override
             public void onChildChanged(DataSnapshot arg0, String arg) {
 
-
-
-                }
-
-
-
-
-
-                       // Gold= myFirebaseRef.child("Game").child("0").child("Gold").toString();
-
-
-
-
+            }
 
 
             @Override
@@ -152,53 +153,41 @@ public class GameScreenFragment extends Fragment {
             }
         });
 
-        return v;
     }
+private void UserPos(MotionEvent event)
+{
 
+    x = (int) event.getX();
+    y = (int) event.getY();
+    user.setxPos(x);
+    user.setyPos(y);
+    c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
+    Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
+    canvas =new Canvas();
+    paint = new Paint();
+    paint.setColor(Color.BLACK);
+    canvas.drawRect(x, y, 25, 25, paint);
+   //holder.unlockCanvasAndPost(canvas);
+}
     private void HandleTouch(MotionEvent event) {
         final int actionPeformed = event.getAction();
 
         switch (actionPeformed) {
             case MotionEvent.ACTION_DOWN: {
-
-                x = (int) event.getX();
-                y = (int) event.getY();
-                user.setxPos(x);
-                user.setyPos(y);
-                c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
-                Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
-                Canvas canvas=new Canvas();
-                canvas.drawColor(Color.BLACK);
-                canvas.drawCircle(event.getX(), event.getY(), 50, paint);
+                UserPos(event);
                 break;
             }
 
             case MotionEvent.ACTION_MOVE: {
-                x = (int) event.getX();
-                y = (int) event.getY();
-                user.setxPos(x);
-                user.setyPos(y);
-                user.setColor(Color.GREEN);
-                Canvas canvas=new Canvas();
-                canvas.drawColor(Color.BLACK);
-                canvas.drawCircle(event.getX(), event.getY(), 50, paint);
-
-
-                c.UpdateNodeXY("Game/0", user.getxPos(), user.getyPos());
-                Log.i("ACTION_MOVE","Resultat: "+x+","+y);
+                UserPos(event);
                 break;
             }
         }
     }
 
-    public void onDraw(Canvas canvas) {
 
-            paint.setStyle(Paint.Style.FILL);
-          canvas.drawCircle(x, y,50 ,paint);
-            paint.setStyle(Paint.Style.STROKE);
-
-        }
     }
+
 
 
 
