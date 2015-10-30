@@ -8,9 +8,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.client.Firebase;
+
 
 public class MainActivity extends ActionBarActivity {
 MainMenuFragment mainMenuFragment;
+    Connecter connecter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,6 +25,9 @@ MainMenuFragment mainMenuFragment;
             ft.replace(R.id.fragmentContainer, mainMenuFragment);
             ft.commit();
             Log.i("onCreate", "");
+
+            //connecter = new Connecter(new Firebase("https://vivid-heat-894.firebaseio.com/"),"hej");
+            //connecter.SetAllToDefaultValuesOnFirebase(new Firebase("https://vivid-heat-894.firebaseio.com/"));
         }
     }
 

@@ -45,7 +45,7 @@ public class Connecter {
     private Firebase mMainConnectionRef;
     private String mShortcut;
     private boolean mInLobby;
-    private Firebase playerRef = new Firebase("https://vivid-heat-894.firebaseio.com/player1");//Lek värde
+    private Firebase playerRef = new Firebase("https://vivid-heat-894.firebaseio.com/");//Lek värde
     private double mGold = 0;
     private double mKills;
     private double mScore;
@@ -56,17 +56,74 @@ public class Connecter {
     private Action action;
     private String[] playerName;
     private boolean[] mPlayerReady;
+
     private String mMyPlayerName;
     //private List<ValueEventListener> mValueEeventListenerList;
     private List<ListenerMemory> mListenerMemory;
 
+    //region Getters and Setters
+    public String getmMyPlayerName() {
+        return mMyPlayerName;
+    }
 
-    public int GetPlayerNuber()
-    {
+    public void setMyPlayerName(String mMyPlayerName) {
+        this.mMyPlayerName = mMyPlayerName;
+    }
+
+    public String getPlayerName(int index) {
+        return playerName[index];
+    }
+
+    public boolean getPlayerReady(int index) { return mPlayerReady[index];}
+
+    public boolean[] getAllPlayersReadiness() {return mPlayerReady;}
+
+    public Action getAction() {
+        return action;
+    }
+
+    public int getPlayerNr() {
         return playerNr;
     }
 
+    public boolean IsLobbyHost() {
+        return mIsLobbyHost;
+    }
 
+    public double getLivesLeft() {
+        return mLivesLeft;
+    }
+
+    public double getScore() {
+        return mScore;
+    }
+
+    public double getKills() {
+        return mKills;
+    }
+
+    public double getGold() {
+        return mGold;
+    }
+
+    public boolean isInLobby() {
+        return mInLobby;
+    }
+
+    public void setInLobby(boolean mInLobby) {
+        this.mInLobby = mInLobby;
+    }
+
+    /** Om man vill snabbtesta.
+     * public void setmShortcut(String mShortcut) {
+        this.mShortcut = mShortcut;
+    }*/
+
+    /** Ska sättas i konstruktorn.
+    public void setmMainConnectionRef(Firebase mMainConnectionRef) {
+        this.mMainConnectionRef = mMainConnectionRef;
+    }*/
+//endregion
 
     public Connecter(Firebase mainConnectionRef, String myPlayerName)
     {
@@ -255,6 +312,10 @@ public class Connecter {
                 playerNr = i;
                 UpdateNodeStr( "Lobby/"+i,"name",mMyPlayerName);
                 mShortcut = "Game/"+Integer.toString(playerNr);
+                if(i==0)
+                {
+                    mIsLobbyHost = true;
+                }
                 return true;
             }
         }
@@ -272,6 +333,7 @@ public class Connecter {
                 ReadyFlipFlop(mPlayerReady,playerNr);
             }
         }
+        mIsLobbyHost = false;
     }
 
     private void RemoveLobbyListeners()
@@ -326,19 +388,62 @@ public class Connecter {
         UpdateNodeBool("lobby/" + playernumber, "Ready", playerReady[playernumber]);
     }
 
-    private void SetGameOtions()
+    public boolean CommitOtionsChanges(int difficulty,int numberOfLives)
     {
+        if(mIsLobbyHost) {
+            Firebase optionsRef = mMainConnectionRef.child("Options");
+            Map<String, Object> opt = new HashMap<>();
+            opt.put("Difficulty", Integer.toString(difficulty));
+            opt.put("Lives", Integer.toString(numberOfLives));
+            optionsRef.setValue(opt);
+            return true;
+        }
+        else{
+            System.out.println("You are not currently lobby host. Only the host can change otions");
+            return false;
+        }
 
     }
 
-    void IsReadyToPlay()
+    public void SetAllToDefaultValuesOnFirebase(Firebase MainRef)
     {
+        Firebase lobbyRef = MainRef.child("Lobby");
+        Map<String, Object> p = new HashMap<>();
+        p.put("Name","Empty");
+        p.put("Ready", false);
 
-    }
+        Map<String, Map<String, Object>> players = new HashMap<>();
+        players.put("0", p);
+        players.put("1", p);
+        players.put("2", p);
+        players.put("3", p);
 
-    void populateFilds()
-    {
+        lobbyRef.setValue(players);
 
+        Firebase gameRef = MainRef.child("Game");
+        Map<String, Object> val = new HashMap<>();
+        val.put("Position", "0,0");
+        val.put("Kills", "0");
+        val.put("LivesLeft", "100");
+        val.put("Score", "0");
+        val.put("Gold", "0");
+        val.put("IsAlive", true);
+        val.put("Action", "0");
+
+        Map<String, Map<String, Object>> player = new HashMap<>();
+        player.put("0", val);
+        player.put("1", val);
+        player.put("2", val);
+        player.put("3", val);
+
+        gameRef.setValue(player);
+
+        Firebase gameOptionsRef = MainRef.child("Options");
+        Map<String, Object> opt = new HashMap<>();
+        opt.put("difficulty", "0");
+        opt.put("Lives", "100");
+
+        gameOptionsRef.setValue(opt);
     }
 
     /** lobby
@@ -384,10 +489,10 @@ public class Connecter {
      *
      *
      *
-     *          Launch Game
-     *          Options
-     *          lobby host.
-     *          populate fields.
+     *
+     *          Options          Testa
+     *          lobby host.      Testa
+     *          populate fields. Testa
      *          */
 
 }
