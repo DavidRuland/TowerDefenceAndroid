@@ -25,9 +25,12 @@ MainMenuFragment mainMenuFragment;
             ft.replace(R.id.fragmentContainer, mainMenuFragment);
             ft.commit();
             Log.i("onCreate", "");
+            Firebase.setAndroidContext(this);
 
-            //connecter = new Connecter(new Firebase("https://vivid-heat-894.firebaseio.com/"),"hej");
-            //connecter.SetAllToDefaultValuesOnFirebase(new Firebase("https://vivid-heat-894.firebaseio.com/"));
+            connecter = new Connecter(new Firebase("https://vivid-heat-894.firebaseio.com/"),"hej");
+            connecter.SetAllToDefaultValuesOnFirebase(new Firebase("https://vivid-heat-894.firebaseio.com/"));
+            connecter.EnterLobby();
+            connecter.UpdateIntValue(ToUpdate.GOLD,100);
         }
     }
 
