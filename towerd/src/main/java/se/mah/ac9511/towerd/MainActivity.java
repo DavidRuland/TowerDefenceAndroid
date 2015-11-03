@@ -8,20 +8,28 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.client.Firebase;
+
 
 public class MainActivity extends ActionBarActivity {
 MainMenuFragment mainMenuFragment;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Firebase.setAndroidContext(this);
+
+
+
         if (savedInstanceState == null) {
             FragmentManager fm = getSupportFragmentManager();
             mainMenuFragment = new MainMenuFragment();
             FragmentTransaction ft = fm.beginTransaction();
             ft.replace(R.id.fragmentContainer, mainMenuFragment);
             ft.commit();
-            Log.i("onCreate", "");
+            Log.i("MainActivity", "onCreate");
         }
     }
 

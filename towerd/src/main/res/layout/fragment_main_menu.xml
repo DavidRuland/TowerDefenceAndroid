@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/fragmentInkomst"
-    android:background="@drawable/place"
+    android:name="@+id/fragmentInkomst"
+    android:background="@drawable/moontile"
     tools:context="se.mah.ac9511.towerd.MainMenuFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -16,8 +16,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Welcome to tower defece"
         android:textColor="@color/green"
-        android:id="@+id/textView"
-        android:layout_marginTop="89dp"
+        android:name="@+id/textView"
+        android:id="@+id/textView4"
+        android:layout_marginTop="44dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
@@ -27,10 +28,11 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Press play to enter game"
         android:textColor="@color/black"
-        android:id="@+id/textView2"
-        android:layout_below="@+id/textView"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView" />
+        android:name="@+id/textView2"
+        android:id="@+id/textView5"
+        android:layout_below="@+id/textView4"
+        android:layout_alignRight="@+id/textView4"
+        android:layout_alignEnd="@+id/textView4" />
 
     <Button
         android:layout_width="wrap_content"
@@ -38,22 +40,8 @@
         android:text="Play"
         android:background="@drawable/play"
         android:id="@+id/playButton"
-        android:layout_below="@+id/textView2"
-        android:layout_marginTop="58dp"
-        android:layout_alignLeft="@+id/optionsButton"
-        android:layout_alignStart="@+id/optionsButton"
-        android:layout_alignRight="@+id/optionsButton"
-        android:layout_alignEnd="@+id/optionsButton" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Options"
-        android:background="@drawable/options"
-        android:id="@+id/optionsButton"
-        android:layout_below="@+id/playButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="44dp" />
+        android:layout_below="@+id/textView5"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -61,11 +49,11 @@
         android:text="Exit"
         android:background="@drawable/back"
         android:id="@+id/exitButton"
-        android:layout_below="@+id/optionsButton"
-        android:layout_marginTop="52dp"
-        android:layout_alignRight="@+id/optionsButton"
-        android:layout_alignEnd="@+id/optionsButton"
-        android:layout_alignLeft="@+id/optionsButton"
-        android:layout_alignStart="@+id/optionsButton" />
+        android:layout_below="@+id/playButton"
+        android:layout_alignLeft="@+id/playButton"
+        android:layout_alignStart="@+id/playButton"
+        android:layout_marginTop="46dp"
+        android:layout_alignRight="@+id/playButton"
+        android:layout_alignEnd="@+id/playButton" />
 
 </RelativeLayout>

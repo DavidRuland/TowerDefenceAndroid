@@ -36,7 +36,7 @@ public class MainMenuFragment extends Fragment {
         welcome=(TextView)v.findViewById(R.id.textView);
         tPlay=(TextView)v.findViewById(R.id.textView2);
         btnPlay=(Button)v.findViewById(R.id.playButton);
-        btnOptions=(Button)v.findViewById(R.id.optionsButton);
+        //btnOptions=(Button)v.findViewById(R.id.optionsButton);
         btnExit=(Button)v.findViewById(R.id.exitButton);
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,9 +65,9 @@ public class MainMenuFragment extends Fragment {
             }
         });
 
-        btnOptions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+       // btnOptions.setOnClickListener(new View.OnClickListener() {
+          //  @Override
+          //  public void onClick(View v) {
 //                FragmentManager fm = getFragmentManager();
 //                FragmentTransaction ft = fm.beginTransaction();
 //                oF = new optionsFragment();
@@ -75,9 +75,7 @@ public class MainMenuFragment extends Fragment {
 //                ft.addToBackStack(null);
 //                ft.commit();
 
-            }
-        });
-        btnExit.setOnClickListener(new View.OnClickListener() {
+       btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
