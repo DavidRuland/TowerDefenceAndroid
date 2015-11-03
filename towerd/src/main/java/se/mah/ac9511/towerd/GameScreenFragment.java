@@ -51,6 +51,11 @@ public class GameScreenFragment extends Fragment {
 
         View v=inflater.inflate(R.layout.fragment_game_screen, container, false);
         user=getArguments().getParcelable("user");
+        Firebase.setAndroidContext(this.getContext());
+        myFirebaseRef = new Firebase("https://vivid-heat-894.firebaseio.com/");
+        c = new Connecter(myFirebaseRef,user,user.getName());
+        c.EnterGame(user.getPlayerId());
+        Log.v("LobbyFragment", "ID: " +user.getPlayerId());
         surfarceH(v);
         TextViewInfo(v);
 
