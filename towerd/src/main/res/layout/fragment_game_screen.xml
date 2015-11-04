@@ -63,10 +63,10 @@
         android:layout_height="45dp"
         android:background="@drawable/tower1"
         android:id="@+id/imageView3"
-        android:layout_below="@+id/textView2"
-        android:layout_alignRight="@+id/textView"
-        android:layout_alignEnd="@+id/textView"
+        android:layout_below="@+id/textView3"
+        android:layout_marginTop="45dp"
         android:layout_toRightOf="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2" />
+        android:layout_toLeftOf="@+id/textView"
+        android:layout_toStartOf="@+id/textView" />
 
 </RelativeLayout>

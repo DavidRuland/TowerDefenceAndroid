@@ -61,6 +61,7 @@ public class GameScreenFragment extends Fragment implements ConnecterEventListen
         Firebase.setAndroidContext(this.getContext());
         myFirebaseRef = new Firebase("https://vivid-heat-894.firebaseio.com/");
         c = new Connecter(myFirebaseRef,user,user.getName());
+        c.setmPlayerNrEventListener(this);
         c.EnterGame(user.getPlayerId());
         c.setStatusEventListener(this);
         Log.v("LobbyFragment", "ID: " + user.getPlayerId());
@@ -79,6 +80,13 @@ public class GameScreenFragment extends Fragment implements ConnecterEventListen
                 return true;
             }
         });
+//        surfaceView.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                //HandleTouch(event);
+//                return true;
+//            }
+//        });
 
     }
     private void TextViewInfo(View v)
@@ -109,11 +117,71 @@ public class GameScreenFragment extends Fragment implements ConnecterEventListen
        });
 
     }
-
+    private void UserPos(MotionEvent event)
+    {
+        x = (int) event.getX();
+        y = (int) event.getY();
+        user.setxPos(x);
+        user.setyPos(y);
+        c.UpdatePosition(user.getxPos(), user.getyPos());
+    }
+// private void HandleTouch (MotionEvent event) {
+//
+//     final int actionPeformed = event.getAction();
+//     switch (actionPeformed) {
+//         case MotionEvent.ACTION_DOWN: {
+//
+//
+////             viewGroup = (ViewGroup) image1.getParent();
+////             viewGroup.removeView(image1);
+////             viewGroup.addView(image1);
+////             image1.setVisibility(View.VISIBLE);
+////             user.setxPos(x);
+////             user.setyPos(y);
+////             c.UpdatePosition(user.getxPos(), user.getyPos());
+////             PlaceTower();
+////             v.setVisibility(View.VISIBLE);
+////             Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
+//             UserPos(event);
+//             break;
+//         }
+//         case MotionEvent.ACTION_MOVE: {
+////             viewGroup=(ViewGroup)image1.getParent();
+////             viewGroup.removeView(image1);
+////             viewGroup.addView(image1);
+//             //image1.setVisibility(View.VISIBLE);
+//             //user.setxPos(x);
+//            // user.setyPos(y);
+//            // c.UpdatePosition(user.getxPos(), user.getyPos());
+//             UserPos(event);
+//            // v.setVisibility(View.VISIBLE);
+//             Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
+//             break;
+//         }
+//         case MotionEvent.ACTION_UP:
+//             viewGroup=(ViewGroup)image1.getParent();
+//             viewGroup.removeView(image1);
+//             viewGroup.addView(image1);
+//             image1.setVisibility(View.VISIBLE);
+//             user.setxPos(x);
+//             user.setyPos(y);
+//             c.UpdatePosition(user.getxPos(), user.getyPos());
+//             UserPos(event);
+//             PlaceTower();
+//             v.setVisibility(View.VISIBLE);
+//             Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
+//             break;
+//
+//
+//     }
+// }
     private void DragAndDrop(DragEvent event)
     {
         x = (int) event.getX();
         y = (int) event.getY();
+        user.setxPos(x);
+        user.setyPos(y);
+      c.UpdatePosition(user.getxPos(), user.getyPos());
         final int actionPeformed = event.getAction();
         switch (actionPeformed) {
             case DragEvent.ACTION_DRAG_STARTED: {
@@ -122,10 +190,10 @@ public class GameScreenFragment extends Fragment implements ConnecterEventListen
                     Log.v("GameScreenFragment", "Can accept this data");
                     v.setVisibility(View.INVISIBLE);
 
-
                     user.setxPos(x);
                     user.setyPos(y);
                     c.UpdatePosition(user.getxPos(), user.getyPos());
+                    //Toast.makeText(getContext(), "DragEvent.ACTION_DRAG_STARTED: " + x + "," + y,Toast.LENGTH_LONG).show();
                     Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
                 }
 
@@ -148,22 +216,37 @@ public class GameScreenFragment extends Fragment implements ConnecterEventListen
                         v.setVisibility(View.VISIBLE);
                         Log.v("GameScreenFragment", "Test: " + event.getResult());
                         Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
+                        Toast.makeText(getContext(), "ragEvent.ACTION_DROP: " + x + "," + y,Toast.LENGTH_LONG).show();
+
 
                 }
                 break;
             }
+
             case DragEvent.ACTION_DRAG_ENDED:
-                switch (image1.getId()) {
-                    case R.id.imageView3:
-                        viewGroup = (ViewGroup) image1.getParent();
-                        viewGroup.removeView(image1);
-                        viewGroup.addView(image1);
-                        image1.setVisibility(View.VISIBLE);
-                        v.setVisibility(View.VISIBLE);
-                        Log.v("GameScreenFragment", "Test: " + event.getResult());
-                        Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
-                        break;
-                }
+
+                //user.setxPos(x);
+                //user.setyPos(y);
+                //c.UpdatePosition(user.getxPos(), user.getyPos());
+
+                Toast.makeText(getContext(), "DragEvent.ACTION_DRAG_ENDED",Toast.LENGTH_LONG).show();
+                break;
+            case DragEvent.ACTION_DRAG_EXITED:
+
+                break;
+
+//            case DragEvent.ACTION_DRAG_ENDED:
+//                switch (image1.getId()) {
+//                    case R.id.imageView3:
+//                        viewGroup = (ViewGroup) image1.getParent();
+//                        viewGroup.removeView(image1);
+//                        viewGroup.addView(image1);
+//                        image1.setVisibility(View.VISIBLE);
+//                        v.setVisibility(View.VISIBLE);
+//                        Log.v("GameScreenFragment", "Test: " + event.getResult());
+//                        Log.i("ACTION_DOWN", "Resultat: " + x + "," + y);
+//                        break;
+//                }
         }
 
     }
@@ -217,6 +300,11 @@ public class GameScreenFragment extends Fragment implements ConnecterEventListen
                 default:
                     break;
             }
+    }
+
+    @Override
+    public void onPlayerNrUpdate() {
+
     }
 }
 
